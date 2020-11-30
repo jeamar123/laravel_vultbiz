@@ -17,8 +17,12 @@ use Illuminate\Http\Request;
 //     return $request->user();
 // });
 
-Route::post('/login', 'AuthController@login');
-Route::post('/signup', 'AuthController@register');
+Route::post('/company/login', 'AuthController@companyLogin');
+Route::post('/company/signup', 'AuthController@companyRegister');
+Route::post('/company/details', 'CompanyController@getCompanyDetails');
+
+
+
 Route::get('/users', 'AuthController@getAllUsers');
 Route::get('/user/{id}', 'UserController@getUserByID');
 Route::post('/user/update', 'UserController@updateUser');

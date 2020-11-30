@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use DateTime;
 
 use App\User;
+use App\Company;
 
 class AuthController extends Controller
 {
@@ -22,46 +23,90 @@ class AuthController extends Controller
       return $data;
     }
 
-    public function login( Request $request ){
-      $data = array();
-      $count = User::where('email', '=', $request->get('email'))
+    public function userLogin( Request $request ){
+      $token = openssl_random_pseudo_bytes(16);
+      $token = bin2hex($token);
+      $updateArr = array(
+        'token' => $token,
+      );
+      $countUser = User::where('email', '=', $request->get('email'))
                   ->where('password', '=', md5($request->get('password')) )
                   ->count();
-      if($count > 0) {
+
+      if($countUser > 0) {
         $fetch = User::where('email', '=', $request->get('email'))->get();
-        $data['user'] = $fetch[0];
-        $data['status'] = true;
-        $data['message'] = 'Success.';
-      }else{
-        $data['status'] = false;
-        $data['message'] = 'Account does not exist.';
+        $updateRow = User::where('id', $fetch[0]->id)->update($updateArr);
       }
-      return $data;
+
+      if($countUser > 0){
+        return array( 'token' => $token, 'status' => true, 'message' => 'Success.' );
+      }
+
+      return array( 'status' => false, 'message' => 'Account does not exist.' );
     }
 
-    public function register( Request $request ){
-      $data = array();
+    public function userRegister( Request $request ){
       $count = User::where('email', '=', $request->get('email'))->count();
       if($count > 0) {
-        $data['status'] = false;
-        $data['message'] = 'Email already taken.';
-        return $data;
+        return array( 'status' => false, 'message' => 'Email already taken.' );
       }
       $create = User::create([
-                  'user_type' => $request->get('user_type'),
-                  'name' => $request->get('name'),
-                  'email' => $request->get('email'),
-                  'contact_number' => $request->get('mobile'),
-                  'password' => md5($request->get('password')),
-                ]);
+        'name' => $request->get('name'),
+        'email' => $request->get('email'),
+        'contact_number' => $request->get('mobile'),
+        'password' => md5($request->get('password')),
+      ]);
+
       if( $create ){
-          $data['status'] = true;
-          $data['message'] = 'Success.';
+        return array( 'status' => true, 'message' => 'Registration Successful.' );
       } else {
-          $data['status'] = false;
-          $data['message'] = 'Failed.';
+        return array( 'status' => false, 'message' => 'Failed. Something went wrong.' );
       }
-      return $data;
+    }
+
+
+
+
+
+    public function companyLogin( Request $request ){
+      $token = openssl_random_pseudo_bytes(16);
+      $token = bin2hex($token);
+      $updateArr = array(
+        'token' => $token,
+      );
+      $countCompany = Company::where('email', '=', $request->get('email'))
+                  ->where('password', '=', md5($request->get('password')) )
+                  ->count();
+
+      if($countCompany > 0) {
+        $fetch = Company::where('email', '=', $request->get('email'))->get();
+        $updateRow = Company::where('id', $fetch[0]->id)->update($updateArr);
+      }
+
+      if($countCompany > 0){
+        return array( 'token' => $token, 'status' => true, 'message' => 'Success.' );
+      }
+
+      return array( 'status' => false, 'message' => 'Account does not exist.' );
+    }
+
+    public function companyRegister( Request $request ){
+      $count = Company::where('email', '=', $request->get('email'))->count();
+      if($count > 0) {
+        return array( 'status' => false, 'message' => 'Email already taken.' );
+      }
+      $create = Company::create([
+        'company_name' => $request->get('company_name'),
+        'email' => $request->get('email'),
+        'contact_number' => $request->get('mobile'),
+        'password' => md5($request->get('password')),
+      ]);
+      
+      if( $create ){
+        return array( 'status' => true, 'message' => 'Registration Successful.' );
+      } else {
+        return array( 'status' => false, 'message' => 'Failed. Something went wrong.' );
+      }
     }
 
 }
