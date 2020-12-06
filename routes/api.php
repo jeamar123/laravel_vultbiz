@@ -22,3 +22,8 @@ Route::post('/signup', 'AuthController@register');
 Route::get('/users', 'AuthController@getAllUsers');
 Route::get('/user/{id}', 'UserController@getUserByID');
 Route::post('/user/update', 'UserController@updateUser');
+
+
+
+Route::get('/shops', 'ShopsController@getAllShops');
+Route::post('/shops/{id}', 'ShopsController@getShopByID');
